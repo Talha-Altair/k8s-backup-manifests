@@ -22,15 +22,15 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts: 
-            - mountPath: /var/www/html
-              name: wordpress-persistent-storage
+            - mountPath: /data
+              name: alpine-data
             - mountPath: /command.sh
               subPath: command.sh
               name: command-cm
       volumes: 
-        - name: wordpress-persistent-storage
+        - name: alpine-data
           persistentVolumeClaim: 
-            claimName: wordpress-pvc
+            claimName: alpine-data
         - name: command-cm
           configMap:
             name: alpine-file
@@ -42,7 +42,7 @@ metadata:
 data:
   command.sh: |
     while true; do
-      echo $(date) > /data/file.txt
+      echo $(date) >> /data/file.txt
       sleep 5
     done
 ---
@@ -56,4 +56,15 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: alpine-data
+spec:
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
