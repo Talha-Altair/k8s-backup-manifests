@@ -33,7 +33,7 @@ metadata:
 data:
   command.sh: |
     while true; do
-      echo $(date) | tee /data/file.txt
+      echo $(date) | tee -a /data/file.txt
       sleep 5
     done
 ---
