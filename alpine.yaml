@@ -1,35 +1,30 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: alpine
+  name: ubuntu
+  labels:
+    app: ubuntu
 spec:
-  selector:
-    matchLabels:
-      app: alpine
-  template:
-    metadata:
-      labels:
-        app: alpine
-    spec:
-      containers:
-      - name: alpine
-        image: alpine
-        command: ["ash /command.sh"]
-        ports:
-        - containerPort: 80
-        volumeMounts: 
-            - mountPath: /data
-              name: alpine-data
-            - mountPath: /command.sh
-              subPath: command.sh
-              name: command-cm
-      volumes: 
-        - name: alpine-data
-          persistentVolumeClaim: 
-            claimName: alpine-data
-        - name: command-cm
-          configMap:
-            name: alpine-file
+  containers:
+  - image: ubuntu
+    command:
+      - "sh"
+      - "/command.sh"
+    imagePullPolicy: IfNotPresent
+    name: ubuntu
+    volumeMounts: 
+        - mountPath: /data
+          name: alpine-data
+        - mountPath: /command.sh
+          subPath: command.sh
+          name: command-cm
+  volumes: 
+    - name: alpine-data
+      persistentVolumeClaim: 
+        claimName: alpine-data
+    - name: command-cm
+      configMap:
+        name: alpine-file
 ---
 apiVersion: v1
 kind: ConfigMap
