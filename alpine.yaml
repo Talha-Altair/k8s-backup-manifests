@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine
+spec:
+  selector:
+    matchLabels:
+      app: alpine
+  template:
+    metadata:
+      labels:
+        app: alpine
+    spec:
+      containers:
+      - name: alpine
+        image: alpine
+        command: ["ash /command.sh"]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        volumeMounts: 
+            - mountPath: /var/www/html
+              name: wordpress-persistent-storage
+            - mountPath: /command.sh
+              subPath: command.sh
+              name: command-cm
+      volumes: 
+        - name: wordpress-persistent-storage
+          persistentVolumeClaim: 
+            claimName: wordpress-pvc
+        - name: command-cm
+          configMap:
+            name: alpine-file
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alpine-file
+data:
+  command.sh: |
+    while true; do
+      echo $(date) > /data/file.txt
+      sleep 5
+    done
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alpine
+spec:
+  selector:
+    app: alpine
+  ports:
+  - port: 80
+    targetPort: 80
+
