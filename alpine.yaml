@@ -15,10 +15,6 @@ spec:
       - name: alpine
         image: alpine
         command: ["ash /command.sh"]
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
         ports:
         - containerPort: 80
         volumeMounts: 
